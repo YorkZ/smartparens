@@ -1,7 +1,21 @@
+SHELL = /bin/sh
 EMACS ?= emacs
 CASK ?= cask
 ECUKES ?= ecukes
+FILES = $(wildcard *.el)
+ELCFILES = $(FILES:.el=.elc)
+
+LIBS =
+
+.PHONY: all compile clean clean-elc clean-elpa elpa ecukes-features test unit-tests print-deps travis-ci
+
 #$(shell find elpa/ecukes-*/ecukes | tail -1)
+
+all: compile
+compile: $(ELCFILES)
+
+$(ELCFILES): %.elc: %.el
+	@$(EMACS) --batch -Q -L . $(LIBS) -f batch-byte-compile $<
 
 test: unit-tests #ecukes-features
 
@@ -20,7 +34,7 @@ clean-elpa:
 	rm -rf elpa
 
 clean-elc:
-	rm -f *.elc tests/*.elc
+	rm -f $(ELCFILES) tests/*.elc
 
 clean: clean-elpa clean-elc
 
